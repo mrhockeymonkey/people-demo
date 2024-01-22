@@ -12,4 +12,4 @@ public record Username(string Value) : NonEmptyString(Value);
 public record FirstName(string Value) : NonEmptyString(Value);
 public record LastName(string Value) : NonEmptyString(Value);
 
-public record Person(FirstName FirstName, LastName LastName, Username Username);
+public record Person(FirstName FirstName, Option<LastName> LastName, Username Username);

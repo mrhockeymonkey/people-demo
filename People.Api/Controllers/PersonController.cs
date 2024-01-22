@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using People.Api.Domain;
 
@@ -20,21 +19,30 @@ public class PersonController : ControllerBase
     [HttpGet(Name = "GetPerson")]
     public async Task<IActionResult> Get(string username) // in prod would use a dto object
     {
+        if (TryGetUsername(username, out var validUsername))
+        {
+            var personOption = await _provider.GetAsync(validUsername);
+            
+            return personOption
+                .Map(p => Ok(p) as IActionResult)
+                .Reduce(NotFound);
+        }
+
+        return BadRequest();
+    }
+
+    private bool TryGetUsername(string value, out Username username)
+    {
         try
         {
-            var id = new Username(username);
-            var personOption = await _provider.GetAsync(id);
-
-            // not sure I like this... note to self look for a nicer way to optionally return from controller. 
-            return personOption.Reduce(() => null) switch
-            {
-                null => NotFound(),
-                Person p => Ok(p)
-            };
+            var un = new Username(value);
+            username = un;
+            return true;
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            return BadRequest();
+            username = default!;
+            return false;
         }
     }
 }

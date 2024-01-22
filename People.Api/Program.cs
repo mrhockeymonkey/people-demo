@@ -37,6 +37,14 @@ app.UseAuthorization();
 app.MapControllers();
 
 var store = app.Services.GetRequiredService<IPersonStore>();
-store.AddOrUpdate(new Person(new FirstName("Scott"), new LastName("Matthews"), new Username("scottm")));
+store.AddOrUpdate(
+    new Person(new FirstName("Scott"), 
+        Option<LastName>.Some(new LastName("Matthews")), 
+        new Username("scottm")));
+
+store.AddOrUpdate(
+    new Person(new FirstName("Aristotle"), 
+        Option<LastName>.None(), 
+        new Username("arist")));
 
 app.Run();
